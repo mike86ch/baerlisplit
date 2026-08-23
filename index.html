@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>BärliSplit</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <link
+        rel="manifest"
+        href="manifest.json">
+
+    <meta
+        name="theme-color"
+        content="#2f7cf6">
+
+</head>
+
+<body>
+
+    <!-- Login -->
+
+    <div
+        id="loginContainer"
+        class="card">
+
+        <h2>Anmeldung</h2>
+
+        <form id="loginForm">
+
+            <input
+                type="email"
+                id="loginEmail"
+                placeholder="E-Mail"
+                required>
+
+            <input
+                type="password"
+                id="loginPassword"
+                placeholder="Passwort"
+                required>
+
+            <button type="submit">
+                Anmelden
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- App -->
+
+    <div
+        id="appContainer"
+        style="display:none;">
+
+        <div class="container">
+
+            <h1>🐻 BärliSplit</h1>
+
+            <!-- Neue Ausgabe -->
+
+            <div class="card">
+
+                <div class="top-bar">
+
+                    <button
+                        type="button"
+                        class="logout-button"
+                        onclick="logoutUser()">
+
+                        Abmelden
+
+                    </button>
+
+                </div>
+
+                <h2>Neue Ausgabe</h2>
+
+                <form id="expenseForm">
+
+                    <input
+                        type="date"
+                        id="expenseDate"
+                        required>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        placeholder="Betrag CHF"
+                        step="0.01"
+                        required>
+
+<select id="payer">
+    <option value="Michi">💳 Michi bezahlt</option>
+    <option value="Sabrina">💳 Sabrina bezahlt</option>
+</select>
+
+<select id="beneficiary">
+    <option value="Beide">
+        👥 Für beide
+    </option>
+
+    <option value="Michi">
+        👤 Für Michi
+    </option>
+
+    <option value="Sabrina">
+        👤 Für Sabrina
+    </option>
+</select>
+
+                    <select id="category">
+
+                        <option>Lebensmittel</option>
+                        <option>Essen auswärts</option>
+                        <option>Wohnen</option>
+                        <option>Haushalt</option>
+                        <option>Mobilität</option>
+                        <option>Freizeit</option>
+                        <option>Ferien</option>
+                        <option>Gesundheit</option>
+                        <option>Abos & Kommunikation</option>
+                        <option>Sonstiges</option>
+
+                    </select>
+
+                    <input
+                        type="text"
+                        id="description"
+                        placeholder="Beschreibung">
+
+                    <button type="submit">
+                        Speichern
+                    </button>
+
+                </form>
+
+            </div>
+
+            <!-- Saldo -->
+
+            <div class="card">
+
+                <h2>Saldo</h2>
+
+                <div id="saldoBox">
+                    Wird berechnet...
+                </div>
+
+            </div>
+
+            <!-- Ausgaben -->
+
+            <div class="card">
+
+                <h2>Ausgaben</h2>
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Datum</th>
+                            <th>Betrag</th>
+                            <th>Zahler</th>
+                            <th>Für wen</th>
+                            <th>Kategorie</th>
+                            <th>Beschreibung</th>
+                            <th>Aktionen</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="expensesTable"></tbody>
+
+                </table>
+
+            </div>
+
+            <!-- Aktivitätsfeed -->
+
+            <div class="card">
+
+                <div class="activity-header">
+
+                    <h2>
+                        📝 Letzte Aktivitäten
+                    </h2>
+
+                </div>
+
+                <div id="activityFeed">
+
+                    Aktivitäten werden geladen...
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
+
+    <script>
+
+        if ("serviceWorker" in navigator) {
+
+            navigator.serviceWorker
+                .register("sw.js");
+
+        }
+
+    </script>
+
+</body>
+
+</html>

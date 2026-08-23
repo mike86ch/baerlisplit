@@ -1,0 +1,335 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: #111;
+    background: #f4f6f8;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+.card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+form {
+    display: grid;
+    gap: 10px;
+}
+
+input,
+select,
+button {
+    font-size: 16px;
+    padding: 10px;
+}
+
+input,
+select {
+    width: 100%;
+}
+
+button {
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+    background: #2f7cf6;
+}
+
+button:hover {
+    background: #2468d4;
+}
+
+/* Login */
+
+#loginContainer {
+    max-width: 500px;
+    margin: 80px auto;
+}
+
+/* Tabelle */
+
+table {
+    width: 100%;
+    min-width: 700px;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: middle;
+}
+
+th {
+    text-align: left;
+}
+
+th:last-child,
+td:last-child {
+    width: 120px;
+    text-align: center;
+}
+
+/* Saldo */
+
+#saldoBox {
+    font-size: 20px;
+    line-height: 1.6;
+}
+
+.saldo-positive {
+    color: green;
+    font-weight: bold;
+}
+
+.saldo-negative {
+    color: red;
+    font-weight: bold;
+}
+
+.saldo-balanced {
+    color: #2f7cf6;
+    font-weight: bold;
+}
+
+/* Aktionsbuttons */
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.edit-button,
+.delete-button {
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    min-height: 38px;
+
+    padding: 0;
+
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    border: none;
+    border-radius: 8px;
+
+    font-family: Arial, sans-serif;
+    font-size: 22px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.edit-button {
+    background: #f39c12;
+    color: white;
+}
+
+.edit-button:hover {
+    background: #d68910;
+    transform: scale(1.05);
+}
+
+.delete-button {
+    background: #e74c3c;
+    color: white;
+}
+
+.delete-button:hover {
+    background: #c0392b;
+    transform: scale(1.05);
+}
+
+.edit-button:focus-visible,
+.delete-button:focus-visible {
+    outline: 3px solid rgba(47, 124, 246, 0.35);
+    outline-offset: 2px;
+}
+
+.edit-save-button {
+    background: #f39c12;
+}
+
+.edit-save-button:hover {
+    background: #d68910;
+}
+
+/* Logout-Button */
+
+button[onclick="logoutUser()"] {
+    background: #555;
+}
+
+button[onclick="logoutUser()"]:hover {
+    background: #444;
+}
+
+/* Mobile */
+
+@media (max-width: 768px) {
+
+    .container {
+        margin: 10px auto;
+        padding: 10px;
+    }
+
+    .card {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 32px;
+    }
+
+    h2 {
+        font-size: 26px;
+    }
+
+    input,
+    select,
+    button {
+        min-height: 50px;
+        font-size: 18px;
+    }
+
+    th,
+    td {
+        padding: 10px 6px;
+        font-size: 14px;
+    }
+
+    #saldoBox {
+        font-size: 24px;
+    }
+
+    .edit-button,
+    .delete-button {
+        width: 42px;
+        min-width: 42px;
+        height: 42px;
+        min-height: 42px;
+        font-size: 24px;
+    }
+
+    th:last-child,
+    td:last-child {
+        width: 110px;
+    }
+}
+
+#loginContainer {
+    max-width: 500px;
+    margin: 80px auto;
+}
+
+@media (max-width: 768px) {
+
+    #loginContainer {
+        margin: 20px;
+    }
+
+    #loginContainer h2 {
+        text-align: center;
+    }
+}
+
+.top-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.logout-button {
+    background: #555;
+}
+
+.logout-button:hover {
+    background: #444;
+}
+
+.activity-line {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    line-height: 1.4;
+}
+
+.activity-line:last-child {
+    border-bottom: none;
+}
+
+.activity-meta {
+    color: #666;
+    font-size: 14px;
+}
+
+#activityFeed {
+    max-height: 650px;
+    overflow-y: auto;
+}
+
+.secondary-button {
+    width: auto;
+    margin-bottom: 10px;
+}
+
+#activityFeed {
+    max-height: 650px;
+    overflow-y: auto;
+}
+
+.activity-expand {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.secondary-button {
+    width: auto;
+    background: #555;
+}
+
+.secondary-button:hover {
+    background: #444;
+}
+
+.activity-line {
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+    line-height: 1.4;
+    font-size: 14px;
+}
+
+.activity-meta {
+    color: #666;
+    font-size: 12px;
+}
