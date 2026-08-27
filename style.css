@@ -19,6 +19,20 @@ h1 {
     text-align: center;
 }
 
+.app-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+}
+
+.app-logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
 h2 {
     margin-top: 0;
 }
