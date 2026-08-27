@@ -436,17 +436,24 @@ async function loadExpenses() {
             );
 
 
-    if (error) {
+if (error) {
+    console.error(error);
 
-        console.error(error);
-
+    if (error.message?.includes("JWT issued at future")) {
+        await supabaseClient.auth.signOut();
         alert(
-            "Die Buchungen konnten nicht geladen werden: " +
-            error.message
+            "Die Anmeldung ist ungültig geworden. Bitte erneut anmelden."
         );
-
+        showLogin();
         return;
     }
+
+    alert(
+        "Die Buchungen konnten nicht geladen werden: " +
+        error.message
+    );
+    return;
+}
 
 
     /*
