@@ -1,4 +1,4 @@
-const CACHE_NAME = "baerlisplit-v17";
+const CACHE_NAME = "baerlisplit-v18";
 
 const urlsToCache = [
     "./",
