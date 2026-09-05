@@ -1080,6 +1080,17 @@ function buildAnalysis(expenses) {
     renderChart(totals);
 }
 
+const CATEGORY_COLORS = {
+    "Lebensmittel & Haushalt": "#55a868",
+    "Essen auswärts": "#f2c14e",
+    "Wohnen": "#8e6ccf",
+    "Auto": "#2f7cf6",
+    "Freizeit & Ferien": "#e76f51",
+    "Gesundheit": "#4db6ac",
+    "Abos": "#f28e8e",
+    "Sonstiges": "#9e9e9e"
+};
+
 function renderSummary(totals) {
     const summary =
         document.getElementById("analysisSummary");
@@ -1102,12 +1113,12 @@ function renderSummary(totals) {
     }
 
     let html = `
-        <p>
-            <strong>
-                Gesamtausgaben:
-                CHF ${grandTotal.toFixed(2)}
-            </strong>
+        <p class="analysis-total">
+            Gesamtausgaben:
+            CHF ${grandTotal.toFixed(2)}
         </p>
+
+        <div class="analysis-categories">
     `;
 
     entries.forEach(([category, amount]) => {
@@ -1116,14 +1127,31 @@ function renderSummary(totals) {
                 ? (amount / grandTotal) * 100
                 : 0;
 
+        const color =
+            CATEGORY_COLORS[category] || "#9e9e9e";
+
         html += `
-            <div>
-                ${escapeHtml(category)}:
-                CHF ${amount.toFixed(2)}
-                (${percentage.toFixed(1)} %)
+            <div class="analysis-category">
+                <span
+                    class="category-color"
+                    style="background-color: ${color};"
+                ></span>
+
+                <div>
+                    <div class="category-name">
+                        ${escapeHtml(category)}
+                    </div>
+
+                    <div class="category-value">
+                        CHF ${amount.toFixed(2)}
+                        (${percentage.toFixed(1)} %)
+                    </div>
+                </div>
             </div>
         `;
     });
+
+    html += `</div>`;
 
     summary.innerHTML = html;
 }
@@ -1153,31 +1181,19 @@ function renderChart(totals) {
             labels: labels,
             datasets: [{
                 data: values,
-                backgroundColor: [
-                    "#2f7cf6",
-                    "#55a868",
-                    "#f2c14e",
-                    "#e76f51",
-                    "#8e6ccf",
-                    "#4db6ac",
-                    "#f28e8e",
-                    "#9e9e9e"
-                ]
+backgroundColor: labels.map(
+    category =>
+        CATEGORY_COLORS[category] || "#9e9e9e"
+)
             }]
         },
 options: {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-        legend: {
-            position: "bottom",
-            labels: {
-                boxWidth: 10,
-                padding: 8,
-                font: {
-                    size: 10
-                }
-            }
+legend: {
+    display: false
+}
         }
     }
 }

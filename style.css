@@ -360,3 +360,37 @@ button[onclick="logoutUser()"]:hover {
     width: 100% !important;
     height: 100% !important;
 }
+
+.analysis-total {
+    margin: 14px 0;
+    font-weight: bold;
+}
+
+.analysis-categories {
+    display: grid;
+    gap: 10px;
+}
+
+.analysis-category {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+}
+
+.category-color {
+    width: 12px;
+    height: 12px;
+    min-width: 12px;
+    margin-top: 3px;
+    border-radius: 3px;
+}
+
+.category-name {
+    font-weight: bold;
+}
+
+.category-value {
+    margin-top: 2px;
+    color: #666;
+    font-size: 13px;
+}
