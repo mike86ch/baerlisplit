@@ -347,3 +347,16 @@ button[onclick="logoutUser()"]:hover {
     color: #666;
     font-size: 12px;
 }
+
+.chart-container {
+    position: relative;
+    width: 240px;
+    height: 240px;
+    max-width: 100%;
+    margin: 16px auto 0;
+}
+
+#categoryChart {
+    width: 100% !important;
+    height: 100% !important;
+}

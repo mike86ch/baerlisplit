@@ -1165,14 +1165,22 @@ function renderChart(totals) {
                 ]
             }]
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: "bottom"
+options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            position: "bottom",
+            labels: {
+                boxWidth: 10,
+                padding: 8,
+                font: {
+                    size: 10
                 }
             }
         }
+    }
+}
     });
 }
 
