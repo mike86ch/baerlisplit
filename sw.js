@@ -1,4 +1,4 @@
-const CACHE_NAME = "baerlisplit-v21";
+const CACHE_NAME = "baerlisplit-v22";
 
 const urlsToCache = [
     "./",
@@ -6,6 +6,7 @@ const urlsToCache = [
     "./style.css",
     "./app.js",
     "./manifest.json",
+    "./favicon.ico",
     "./icon-192.png",
     "./icon-512.png"
 ];
