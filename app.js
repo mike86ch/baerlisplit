@@ -23,7 +23,8 @@ let currentUserId = null;
 let currentUserName = null;
 let activityLimit = 3;
 let expandedActivities = false;
-
+let expenseLimit = 5;
+let expandedExpenses = false;
 
 const loginContainer =
     document.getElementById("loginContainer");
@@ -499,18 +500,19 @@ updateSaldo(
 
 
 function renderExpensesTable(expenses) {
-
     const table =
         document.getElementById(
             "expensesTable"
         );
 
+    const expandContainer =
+        document.getElementById(
+            "expensesExpand"
+        );
 
     table.innerHTML = "";
 
-
     if (expenses.length === 0) {
-
         table.innerHTML = `
             <tr>
                 <td colspan="7">
@@ -519,17 +521,23 @@ function renderExpensesTable(expenses) {
             </tr>
         `;
 
+        expandContainer.style.display =
+            "none";
+
         return;
     }
 
-
-    expenses.forEach(expense => {
-
-        const amount =
-            Number(
-                expense.amount
+    const visibleExpenses =
+        expandedExpenses
+            ? expenses
+            : expenses.slice(
+                0,
+                expenseLimit
             );
 
+    visibleExpenses.forEach(expense => {
+        const amount =
+            Number(expense.amount);
 
         const formattedDate =
             new Date(
@@ -539,12 +547,13 @@ function renderExpensesTable(expenses) {
                 "de-CH"
             );
 
-
-      const beneficiaryLabel =
-    expense.beneficiary === "Beide"
-        ? "👥 Beide"
-        : "👤 " + expense.beneficiary;
-
+        const beneficiaryLabel =
+            expense.beneficiary === "Beide"
+                ? "👥 Beide"
+                : "👤 " +
+                  escapeHtml(
+                      expense.beneficiary
+                  );
 
         table.innerHTML += `
             <tr>
@@ -584,7 +593,8 @@ function renderExpensesTable(expenses) {
                         class="edit-button"
                         onclick="editExpense(${expense.id})"
                         title="Buchung bearbeiten"
-                        aria-label="Buchung bearbeiten">
+                        aria-label="Buchung bearbeiten"
+                    >
                         ✎
                     </button>
 
@@ -593,15 +603,46 @@ function renderExpensesTable(expenses) {
                         class="delete-button"
                         onclick="deleteExpense(${expense.id})"
                         title="Buchung löschen"
-                        aria-label="Buchung löschen">
+                        aria-label="Buchung löschen"
+                    >
                         ×
                     </button>
                 </td>
             </tr>
         `;
     });
+
+    if (expenses.length > expenseLimit) {
+        expandContainer.style.display =
+            "block";
+
+        expandContainer.innerHTML = `
+            <button
+                type="button"
+                class="secondary-button"
+                onclick="toggleExpenses()"
+            >
+                ${
+                    expandedExpenses
+                        ? "▲ Weniger anzeigen"
+                        : `▼ Mehr anzeigen (${expenses.length - expenseLimit})`
+                }
+            </button>
+        `;
+    } else {
+        expandContainer.style.display =
+            "none";
+    }
 }
 
+function toggleExpenses() {
+    expandedExpenses =
+        !expandedExpenses;
+
+    renderExpensesTable(
+        expensesCache
+    );
+}
 
 function updateSaldo(
     michiAnteil,
@@ -1043,10 +1084,128 @@ const PAYER_COLORS = {
     "Sabrina": "#e76f51"
 };
 
-function loadAnalysis() {
-    const period =
+function updateAnalysisPeriods() {
+    const periodType =
         document.getElementById(
             "analysisPeriod"
+        ).value;
+
+    const periodSelect =
+        document.getElementById(
+            "analysisPeriodValue"
+        );
+
+    const periodContainer =
+        document.getElementById(
+            "analysisPeriodValueContainer"
+        );
+
+    if (periodType === "all") {
+        periodContainer.style.display =
+            "none";
+
+        periodSelect.innerHTML = "";
+
+        return;
+    }
+
+    periodContainer.style.display =
+        "block";
+
+    const currentValue =
+        periodSelect.value;
+
+    if (periodType === "month") {
+        const months =
+            [
+                ...new Set(
+                    expensesCache.map(
+                        expense =>
+                            expense.expense_date
+                                .slice(0, 7)
+                    )
+                )
+            ].sort(
+                (a, b) =>
+                    b.localeCompare(a)
+            );
+
+        periodSelect.innerHTML =
+            months.map(monthKey => {
+                const [year, month] =
+                    monthKey.split("-");
+
+                const label =
+                    new Date(
+                        Number(year),
+                        Number(month) - 1,
+                        1
+                    ).toLocaleDateString(
+                        "de-CH",
+                        {
+                            month: "long",
+                            year: "numeric"
+                        }
+                    );
+
+                return `
+                    <option value="${monthKey}">
+                        ${label}
+                    </option>
+                `;
+            }).join("");
+    }
+
+    if (periodType === "year") {
+        const years =
+            [
+                ...new Set(
+                    expensesCache.map(
+                        expense =>
+                            expense.expense_date
+                                .slice(0, 4)
+                    )
+                )
+            ].sort(
+                (a, b) =>
+                    Number(b) -
+                    Number(a)
+            );
+
+        periodSelect.innerHTML =
+            years.map(year => `
+                <option value="${year}">
+                    ${year}
+                </option>
+            `).join("");
+    }
+
+    const optionStillExists =
+        [
+            ...periodSelect.options
+        ].some(
+            option =>
+                option.value ===
+                currentValue
+        );
+
+    if (optionStillExists) {
+        periodSelect.value =
+            currentValue;
+    }
+}
+
+function loadAnalysis() {
+    const periodType =
+        document.getElementById(
+            "analysisPeriod"
+        ).value;
+
+    updateAnalysisPeriods();
+
+    const periodValue =
+        document.getElementById(
+            "analysisPeriodValue"
         ).value;
 
     const perspective =
@@ -1059,35 +1218,29 @@ function loadAnalysis() {
             "analysisExpenseType"
         ).value;
 
-    const now = new Date();
-
-    let filteredExpenses =
+    const filteredExpenses =
         expensesCache.filter(expense => {
-            const date = new Date(
-                expense.expense_date +
-                "T00:00:00"
-            );
-
             if (
                 expenseType !== "all" &&
-                expense.beneficiary !== expenseType
+                expense.beneficiary !==
+                    expenseType
             ) {
                 return false;
             }
 
-            if (period === "month") {
+            if (periodType === "month") {
                 return (
-                    date.getMonth() ===
-                        now.getMonth() &&
-                    date.getFullYear() ===
-                        now.getFullYear()
+                    expense.expense_date
+                        .slice(0, 7) ===
+                    periodValue
                 );
             }
 
-            if (period === "year") {
+            if (periodType === "year") {
                 return (
-                    date.getFullYear() ===
-                    now.getFullYear()
+                    expense.expense_date
+                        .slice(0, 4) ===
+                    periodValue
                 );
             }
 
@@ -1111,7 +1264,6 @@ function loadAnalysis() {
     buildTopExpenses(
         perspectiveExpenses
     );
-
 }
 
 function applyPerspective(
@@ -1762,15 +1914,30 @@ function formatCurrency(amount) {
     );
 }
 
-[
-    "analysisPeriod",
-    "analysisPerspective",
-    "analysisExpenseType"
-].forEach(elementId => {
-    document
-        .getElementById(elementId)
-        .addEventListener(
-            "change",
-            loadAnalysis
-        );
-});
+document
+    .getElementById("analysisPeriod")
+    .addEventListener(
+        "change",
+        loadAnalysis
+    );
+
+document
+    .getElementById("analysisPeriodValue")
+    .addEventListener(
+        "change",
+        loadAnalysis
+    );
+
+document
+    .getElementById("analysisPerspective")
+    .addEventListener(
+        "change",
+        loadAnalysis
+    );
+
+document
+    .getElementById("analysisExpenseType")
+    .addEventListener(
+        "change",
+        loadAnalysis
+    );

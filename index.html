@@ -193,6 +193,20 @@
 
                 </table>
 
+                <div
+    id="expensesExpand"
+    class="expenses-expand"
+    style="display: none;"
+>
+    <button
+        type="button"
+        class="secondary-button"
+        onclick="toggleExpenses()"
+    >
+        ▼ Mehr anzeigen
+    </button>
+</div>
+
             </div>
 
             <!-- Aktivitätsfeed -->
@@ -220,6 +234,7 @@
     <h2>📊 Auswertung</h2>
 
     <div class="analysis-filters">
+
         <div>
             <label for="analysisPeriod">
                 Zeitraum
@@ -227,14 +242,25 @@
 
             <select id="analysisPeriod">
                 <option value="month">
-                    Aktueller Monat
+                    Monat
                 </option>
+
                 <option value="year">
-                    Aktuelles Kalenderjahr
+                    Kalenderjahr
                 </option>
+
                 <option value="all">
                     Gesamt
                 </option>
+            </select>
+        </div>
+
+        <div id="analysisPeriodValueContainer">
+            <label for="analysisPeriodValue">
+                Periode
+            </label>
+
+            <select id="analysisPeriodValue">
             </select>
         </div>
 
@@ -247,9 +273,11 @@
                 <option value="all">
                     Gesamt
                 </option>
+
                 <option value="Michi">
                     Michi
                 </option>
+
                 <option value="Sabrina">
                     Sabrina
                 </option>
@@ -265,44 +293,50 @@
                 <option value="all">
                     Alles
                 </option>
+
                 <option value="Beide">
                     Gemeinsam
                 </option>
+
                 <option value="Michi">
                     Nur Michi
                 </option>
+
                 <option value="Sabrina">
                     Nur Sabrina
                 </option>
             </select>
         </div>
+
     </div>
 
     <div class="analysis-section">
         <h3>Kategorienübersicht</h3>
 
-        <div id="analysisSummary"></div>
+        <div class="category-analysis-layout">
 
-        <div class="chart-container">
-            <canvas id="categoryChart"></canvas>
+            <div id="analysisSummary"></div>
+
+            <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+            </div>
+
         </div>
     </div>
 
     <div class="analysis-grid">
+
         <div class="analysis-section">
             <h3>Wer hat diese Ausgaben bezahlt?</h3>
-
             <div id="payerSummary"></div>
-
         </div>
 
         <div class="analysis-section">
             <h3>Top-Ausgabentreiber</h3>
-
             <div id="topExpenses"></div>
         </div>
-    </div>
 
+    </div>
 </div>
 
         </div>

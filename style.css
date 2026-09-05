@@ -398,7 +398,7 @@ button[onclick="logoutUser()"]:hover {
 .analysis-filters {
     display: grid;
     grid-template-columns:
-        repeat(3, minmax(0, 1fr));
+        repeat(4, minmax(0, 1fr));
     gap: 12px;
     margin-bottom: 20px;
 }
@@ -492,5 +492,61 @@ button[onclick="logoutUser()"]:hover {
 
     .trend-chart-container {
         height: 220px;
+    }
+}
+
+.expenses-expand {
+    margin-top: 14px;
+    text-align: center;
+}
+
+.category-analysis-layout {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        220px;
+    gap: 24px;
+    align-items: center;
+}
+
+.category-analysis-layout
+.chart-container {
+    width: 210px;
+    height: 210px;
+    margin: 0 auto;
+}
+
+.analysis-categories {
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 9px 16px;
+}
+
+.analysis-category {
+    min-width: 0;
+}
+
+.analysis-total {
+    margin: 0 0 12px;
+}
+
+.analysis-grid {
+    margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+    .category-analysis-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .analysis-categories {
+        grid-template-columns: 1fr;
+    }
+
+    .category-analysis-layout
+    .chart-container {
+        width: 190px;
+        height: 190px;
+        margin-top: 8px;
     }
 }
