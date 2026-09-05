@@ -265,7 +265,8 @@ const expenseData = {
     beneficiary: beneficiary,
     category: category,
     description: description,
-    actor_name: currentUserName
+    actor_name: currentUserName,
+    owner_user_id: currentUserId
 };
 
 
