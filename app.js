@@ -1175,29 +1175,28 @@ function renderChart(totals) {
 
     canvas.style.display = "block";
 
-    categoryChart = new Chart(canvas, {
-        type: "pie",
-        data: {
-            labels: labels,
-            datasets: [{
-                data: values,
-backgroundColor: labels.map(
-    category =>
-        CATEGORY_COLORS[category] || "#9e9e9e"
-)
-            }]
-        },
-options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-legend: {
-    display: false
-}
+categoryChart = new Chart(canvas, {
+    type: "pie",
+    data: {
+        labels: labels,
+        datasets: [{
+            data: values,
+            backgroundColor: labels.map(
+                category =>
+                    CATEGORY_COLORS[category] || "#9e9e9e"
+            )
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
         }
     }
-}
-    });
+});
 }
 
 document
