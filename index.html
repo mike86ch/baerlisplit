@@ -167,6 +167,54 @@
 
             </div>
            
+            <!-- Ausgaben -->
+
+            <div class="card">
+
+                <h2>Ausgaben</h2>
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Datum</th>
+                            <th>Betrag</th>
+                            <th>Zahler</th>
+                            <th>Für wen</th>
+                            <th>Kategorie</th>
+                            <th>Beschreibung</th>
+                            <th>Aktionen</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="expensesTable"></tbody>
+
+                </table>
+
+            </div>
+
+            <!-- Aktivitätsfeed -->
+
+            <div class="card">
+
+                <div class="activity-header">
+
+                    <h2>
+                        📝 Letzte Aktivitäten
+                    </h2>
+
+                </div>
+
+                <div id="activityFeed">
+
+                    Aktivitäten werden geladen...
+
+                </div>
+
+            </div>
+
 <!-- Auswertung -->
 <div class="card">
     <h2>📊 Auswertung</h2>
@@ -242,13 +290,10 @@
 
     <div class="analysis-grid">
         <div class="analysis-section">
-            <h3>Wer bezahlt was?</h3>
+            <h3>Wer hat diese Ausgaben bezahlt?</h3>
 
             <div id="payerSummary"></div>
 
-            <div class="chart-container chart-container-small">
-                <canvas id="payerChart"></canvas>
-            </div>
         </div>
 
         <div class="analysis-section">
@@ -258,62 +303,7 @@
         </div>
     </div>
 
-    <div class="analysis-section">
-        <h3>Entwicklung über Zeit</h3>
-
-        <div class="trend-chart-container">
-            <canvas id="trendChart"></canvas>
-        </div>
-    </div>
 </div>
-
-            <!-- Ausgaben -->
-
-            <div class="card">
-
-                <h2>Ausgaben</h2>
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-                            <th>Datum</th>
-                            <th>Betrag</th>
-                            <th>Zahler</th>
-                            <th>Für wen</th>
-                            <th>Kategorie</th>
-                            <th>Beschreibung</th>
-                            <th>Aktionen</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="expensesTable"></tbody>
-
-                </table>
-
-            </div>
-
-            <!-- Aktivitätsfeed -->
-
-            <div class="card">
-
-                <div class="activity-header">
-
-                    <h2>
-                        📝 Letzte Aktivitäten
-                    </h2>
-
-                </div>
-
-                <div id="activityFeed">
-
-                    Aktivitäten werden geladen...
-
-                </div>
-
-            </div>
 
         </div>
 

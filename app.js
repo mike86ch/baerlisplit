@@ -1112,10 +1112,6 @@ function loadAnalysis() {
         perspectiveExpenses
     );
 
-    buildTrendAnalysis(
-        perspectiveExpenses,
-        period
-    );
 }
 
 function applyPerspective(
@@ -1372,7 +1368,6 @@ function buildPayerAnalysis(expenses) {
     });
 
     renderPayerSummary(payerTotals);
-    renderPayerChart(payerTotals);
 }
 
 function renderPayerSummary(
