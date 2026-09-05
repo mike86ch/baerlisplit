@@ -468,6 +468,8 @@ if (error) {
         expensesCache
     );
 
+loadAnalysis();
+
 let michiAnteil = 0;
 let sabrinaAnteil = 0;
 
@@ -1020,3 +1022,163 @@ function toggleActivities() {
 
     loadActivities();
 }
+
+let categoryChart = null;
+
+function loadAnalysis() {
+    const period =
+        document.getElementById("analysisPeriod").value;
+
+    let expenses = [...expensesCache];
+    const now = new Date();
+
+    if (period === "month") {
+        expenses = expenses.filter(expense => {
+            const date = new Date(
+                expense.expense_date + "T00:00:00"
+            );
+
+            return (
+                date.getMonth() === now.getMonth() &&
+                date.getFullYear() === now.getFullYear()
+            );
+        });
+    }
+
+    if (period === "year") {
+        expenses = expenses.filter(expense => {
+            const date = new Date(
+                expense.expense_date + "T00:00:00"
+            );
+
+            return (
+                date.getFullYear() === now.getFullYear()
+            );
+        });
+    }
+
+    buildAnalysis(expenses);
+}
+
+function buildAnalysis(expenses) {
+    const totals = {};
+
+    expenses.forEach(expense => {
+        const category =
+            expense.category || "Sonstiges";
+
+        if (!totals[category]) {
+            totals[category] = 0;
+        }
+
+        totals[category] += Number(
+            expense.amount || 0
+        );
+    });
+
+    renderSummary(totals);
+    renderChart(totals);
+}
+
+function renderSummary(totals) {
+    const summary =
+        document.getElementById("analysisSummary");
+
+    const entries = Object.entries(totals)
+        .sort((a, b) => b[1] - a[1]);
+
+    const grandTotal = entries.reduce(
+        (sum, entry) => sum + entry[1],
+        0
+    );
+
+    if (entries.length === 0) {
+        summary.innerHTML = `
+            <p class="empty-message">
+                Für diesen Zeitraum sind noch keine Ausgaben vorhanden.
+            </p>
+        `;
+        return;
+    }
+
+    let html = `
+        <p>
+            <strong>
+                Gesamtausgaben:
+                CHF ${grandTotal.toFixed(2)}
+            </strong>
+        </p>
+    `;
+
+    entries.forEach(([category, amount]) => {
+        const percentage =
+            grandTotal > 0
+                ? (amount / grandTotal) * 100
+                : 0;
+
+        html += `
+            <div>
+                ${escapeHtml(category)}:
+                CHF ${amount.toFixed(2)}
+                (${percentage.toFixed(1)} %)
+            </div>
+        `;
+    });
+
+    summary.innerHTML = html;
+}
+
+function renderChart(totals) {
+    const canvas =
+        document.getElementById("categoryChart");
+
+    if (categoryChart) {
+        categoryChart.destroy();
+        categoryChart = null;
+    }
+
+    const labels = Object.keys(totals);
+    const values = Object.values(totals);
+
+    if (labels.length === 0) {
+        canvas.style.display = "none";
+        return;
+    }
+
+    canvas.style.display = "block";
+
+    categoryChart = new Chart(canvas, {
+        type: "pie",
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: [
+                    "#2f7cf6",
+                    "#55a868",
+                    "#f2c14e",
+                    "#e76f51",
+                    "#8e6ccf",
+                    "#4db6ac",
+                    "#f28e8e",
+                    "#9e9e9e"
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: "bottom"
+                }
+            }
+        }
+    });
+}
+
+document
+    .getElementById("analysisPeriod")
+    .addEventListener(
+        "change",
+        loadAnalysis
+    );

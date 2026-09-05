@@ -28,6 +28,8 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="icon-192.png">
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 
 <body>
@@ -164,6 +166,21 @@
                 </div>
 
             </div>
+           
+<!-- Auswertung -->
+<div class="card">
+    <h2>📊 Auswertung</h2>
+
+    <select id="analysisPeriod">
+        <option value="month">Monat</option>
+        <option value="year">Kalenderjahr</option>
+        <option value="all">Gesamt</option>
+    </select>
+
+    <div id="analysisSummary"></div>
+
+    <canvas id="categoryChart"></canvas>
+</div>
 
             <!-- Ausgaben -->
 
