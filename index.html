@@ -171,17 +171,100 @@
 <div class="card">
     <h2>📊 Auswertung</h2>
 
-    <select id="analysisPeriod">
-        <option value="month">Monat</option>
-        <option value="year">Kalenderjahr</option>
-        <option value="all">Gesamt</option>
-    </select>
+    <div class="analysis-filters">
+        <div>
+            <label for="analysisPeriod">
+                Zeitraum
+            </label>
 
-    <div id="analysisSummary"></div>
+            <select id="analysisPeriod">
+                <option value="month">
+                    Aktueller Monat
+                </option>
+                <option value="year">
+                    Aktuelles Kalenderjahr
+                </option>
+                <option value="all">
+                    Gesamt
+                </option>
+            </select>
+        </div>
 
-<div class="chart-container">
-    <canvas id="categoryChart"></canvas>
-</div>
+        <div>
+            <label for="analysisPerspective">
+                Perspektive
+            </label>
+
+            <select id="analysisPerspective">
+                <option value="all">
+                    Gesamt
+                </option>
+                <option value="Michi">
+                    Michi
+                </option>
+                <option value="Sabrina">
+                    Sabrina
+                </option>
+            </select>
+        </div>
+
+        <div>
+            <label for="analysisExpenseType">
+                Ausgabenart
+            </label>
+
+            <select id="analysisExpenseType">
+                <option value="all">
+                    Alles
+                </option>
+                <option value="Beide">
+                    Gemeinsam
+                </option>
+                <option value="Michi">
+                    Nur Michi
+                </option>
+                <option value="Sabrina">
+                    Nur Sabrina
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <div class="analysis-section">
+        <h3>Kategorienübersicht</h3>
+
+        <div id="analysisSummary"></div>
+
+        <div class="chart-container">
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+
+    <div class="analysis-grid">
+        <div class="analysis-section">
+            <h3>Wer bezahlt was?</h3>
+
+            <div id="payerSummary"></div>
+
+            <div class="chart-container chart-container-small">
+                <canvas id="payerChart"></canvas>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <h3>Top-Ausgabentreiber</h3>
+
+            <div id="topExpenses"></div>
+        </div>
+    </div>
+
+    <div class="analysis-section">
+        <h3>Entwicklung über Zeit</h3>
+
+        <div class="trend-chart-container">
+            <canvas id="trendChart"></canvas>
+        </div>
+    </div>
 </div>
 
             <!-- Ausgaben -->

@@ -1024,61 +1024,8 @@ function toggleActivities() {
 }
 
 let categoryChart = null;
-
-function loadAnalysis() {
-    const period =
-        document.getElementById("analysisPeriod").value;
-
-    let expenses = [...expensesCache];
-    const now = new Date();
-
-    if (period === "month") {
-        expenses = expenses.filter(expense => {
-            const date = new Date(
-                expense.expense_date + "T00:00:00"
-            );
-
-            return (
-                date.getMonth() === now.getMonth() &&
-                date.getFullYear() === now.getFullYear()
-            );
-        });
-    }
-
-    if (period === "year") {
-        expenses = expenses.filter(expense => {
-            const date = new Date(
-                expense.expense_date + "T00:00:00"
-            );
-
-            return (
-                date.getFullYear() === now.getFullYear()
-            );
-        });
-    }
-
-    buildAnalysis(expenses);
-}
-
-function buildAnalysis(expenses) {
-    const totals = {};
-
-    expenses.forEach(expense => {
-        const category =
-            expense.category || "Sonstiges";
-
-        if (!totals[category]) {
-            totals[category] = 0;
-        }
-
-        totals[category] += Number(
-            expense.amount || 0
-        );
-    });
-
-    renderSummary(totals);
-    renderChart(totals);
-}
+let payerChart = null;
+let trendChart = null;
 
 const CATEGORY_COLORS = {
     "Lebensmittel & Haushalt": "#55a868",
@@ -1091,82 +1038,258 @@ const CATEGORY_COLORS = {
     "Sonstiges": "#9e9e9e"
 };
 
-function renderSummary(totals) {
-    const summary =
-        document.getElementById("analysisSummary");
+const PAYER_COLORS = {
+    "Michi": "#2f7cf6",
+    "Sabrina": "#e76f51"
+};
 
-    const entries = Object.entries(totals)
-        .sort((a, b) => b[1] - a[1]);
+function loadAnalysis() {
+    const period =
+        document.getElementById(
+            "analysisPeriod"
+        ).value;
 
-    const grandTotal = entries.reduce(
-        (sum, entry) => sum + entry[1],
-        0
+    const perspective =
+        document.getElementById(
+            "analysisPerspective"
+        ).value;
+
+    const expenseType =
+        document.getElementById(
+            "analysisExpenseType"
+        ).value;
+
+    const now = new Date();
+
+    let filteredExpenses =
+        expensesCache.filter(expense => {
+            const date = new Date(
+                expense.expense_date +
+                "T00:00:00"
+            );
+
+            if (
+                expenseType !== "all" &&
+                expense.beneficiary !== expenseType
+            ) {
+                return false;
+            }
+
+            if (period === "month") {
+                return (
+                    date.getMonth() ===
+                        now.getMonth() &&
+                    date.getFullYear() ===
+                        now.getFullYear()
+                );
+            }
+
+            if (period === "year") {
+                return (
+                    date.getFullYear() ===
+                    now.getFullYear()
+                );
+            }
+
+            return true;
+        });
+
+    const perspectiveExpenses =
+        applyPerspective(
+            filteredExpenses,
+            perspective
+        );
+
+    buildCategoryAnalysis(
+        perspectiveExpenses
     );
+
+    buildPayerAnalysis(
+        perspectiveExpenses
+    );
+
+    buildTopExpenses(
+        perspectiveExpenses
+    );
+
+    buildTrendAnalysis(
+        perspectiveExpenses,
+        period
+    );
+}
+
+function applyPerspective(
+    expenses,
+    perspective
+) {
+    return expenses
+        .map(expense => {
+            let analysisAmount =
+                Number(expense.amount || 0);
+
+            if (perspective === "Michi") {
+                if (
+                    expense.beneficiary ===
+                    "Beide"
+                ) {
+                    analysisAmount =
+                        analysisAmount / 2;
+                } else if (
+                    expense.beneficiary !==
+                    "Michi"
+                ) {
+                    analysisAmount = 0;
+                }
+            }
+
+            if (perspective === "Sabrina") {
+                if (
+                    expense.beneficiary ===
+                    "Beide"
+                ) {
+                    analysisAmount =
+                        analysisAmount / 2;
+                } else if (
+                    expense.beneficiary !==
+                    "Sabrina"
+                ) {
+                    analysisAmount = 0;
+                }
+            }
+
+            return {
+                ...expense,
+                analysisAmount:
+                    analysisAmount
+            };
+        })
+        .filter(
+            expense =>
+                expense.analysisAmount > 0
+        );
+}
+
+function buildCategoryAnalysis(expenses) {
+    const totals = {};
+
+    expenses.forEach(expense => {
+        const category =
+            expense.category ||
+            "Sonstiges";
+
+        if (!totals[category]) {
+            totals[category] = 0;
+        }
+
+        totals[category] +=
+            expense.analysisAmount;
+    });
+
+    renderCategorySummary(totals);
+    renderCategoryChart(totals);
+}
+
+function renderCategorySummary(totals) {
+    const summary =
+        document.getElementById(
+            "analysisSummary"
+        );
+
+    const entries =
+        Object.entries(totals)
+            .sort(
+                (a, b) =>
+                    b[1] - a[1]
+            );
+
+    const grandTotal =
+        entries.reduce(
+            (sum, entry) =>
+                sum + entry[1],
+            0
+        );
 
     if (entries.length === 0) {
         summary.innerHTML = `
             <p class="empty-message">
-                Für diesen Zeitraum sind noch keine Ausgaben vorhanden.
+                Für diese Auswahl sind keine
+                Ausgaben vorhanden.
             </p>
         `;
+
         return;
     }
 
     let html = `
         <p class="analysis-total">
             Gesamtausgaben:
-            CHF ${grandTotal.toFixed(2)}
+            ${formatCurrency(grandTotal)}
         </p>
 
         <div class="analysis-categories">
     `;
 
-    entries.forEach(([category, amount]) => {
-        const percentage =
-            grandTotal > 0
-                ? (amount / grandTotal) * 100
-                : 0;
+    entries.forEach(
+        ([category, amount]) => {
+            const percentage =
+                grandTotal > 0
+                    ? (
+                        amount /
+                        grandTotal
+                    ) * 100
+                    : 0;
 
-        const color =
-            CATEGORY_COLORS[category] || "#9e9e9e";
+            const color =
+                CATEGORY_COLORS[
+                    category
+                ] || "#9e9e9e";
 
-        html += `
-            <div class="analysis-category">
-                <span
-                    class="category-color"
-                    style="background-color: ${color};"
-                ></span>
+            html += `
+                <div class="analysis-category">
+                    <span
+                        class="category-color"
+                        style="
+                            background-color:
+                            ${color};
+                        "
+                    ></span>
 
-                <div>
-                    <div class="category-name">
-                        ${escapeHtml(category)}
-                    </div>
+                    <div class="category-details">
+                        <div class="category-name">
+                            ${escapeHtml(category)}
+                        </div>
 
-                    <div class="category-value">
-                        CHF ${amount.toFixed(2)}
-                        (${percentage.toFixed(1)} %)
+                        <div class="category-value">
+                            ${formatCurrency(amount)}
+                            (${percentage.toFixed(1)} %)
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-    });
+            `;
+        }
+    );
 
     html += `</div>`;
 
     summary.innerHTML = html;
 }
 
-function renderChart(totals) {
+function renderCategoryChart(totals) {
     const canvas =
-        document.getElementById("categoryChart");
+        document.getElementById(
+            "categoryChart"
+        );
 
     if (categoryChart) {
         categoryChart.destroy();
         categoryChart = null;
     }
 
-    const labels = Object.keys(totals);
-    const values = Object.values(totals);
+    const labels =
+        Object.keys(totals);
+
+    const values =
+        Object.values(totals);
 
     if (labels.length === 0) {
         canvas.style.display = "none";
@@ -1175,33 +1298,484 @@ function renderChart(totals) {
 
     canvas.style.display = "block";
 
-categoryChart = new Chart(canvas, {
-    type: "pie",
-    data: {
-        labels: labels,
-        datasets: [{
-            data: values,
-            backgroundColor: labels.map(
-                category =>
-                    CATEGORY_COLORS[category] || "#9e9e9e"
-            )
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false
+    categoryChart =
+        new Chart(canvas, {
+            type: "pie",
+
+            data: {
+                labels: labels,
+
+                datasets: [{
+                    data: values,
+
+                    backgroundColor:
+                        labels.map(
+                            category =>
+                                CATEGORY_COLORS[
+                                    category
+                                ] ||
+                                "#9e9e9e"
+                        ),
+
+                    borderColor: "#ffffff",
+                    borderWidth: 2
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label:
+                                function(
+                                    context
+                                ) {
+                                    return (
+                                        context.label +
+                                        ": " +
+                                        formatCurrency(
+                                            context.raw
+                                        )
+                                    );
+                                }
+                        }
+                    }
+                }
             }
-        }
-    }
-});
+        });
 }
 
-document
-    .getElementById("analysisPeriod")
-    .addEventListener(
-        "change",
-        loadAnalysis
+function buildPayerAnalysis(expenses) {
+    const payerTotals = {
+        "Michi": 0,
+        "Sabrina": 0
+    };
+
+    expenses.forEach(expense => {
+        if (
+            payerTotals[
+                expense.payer
+            ] !== undefined
+        ) {
+            payerTotals[
+                expense.payer
+            ] +=
+                expense.analysisAmount;
+        }
+    });
+
+    renderPayerSummary(payerTotals);
+    renderPayerChart(payerTotals);
+}
+
+function renderPayerSummary(
+    payerTotals
+) {
+    const container =
+        document.getElementById(
+            "payerSummary"
+        );
+
+    const total =
+        payerTotals.Michi +
+        payerTotals.Sabrina;
+
+    if (total === 0) {
+        container.innerHTML = `
+            <p class="empty-message">
+                Keine Zahlungen vorhanden.
+            </p>
+        `;
+
+        return;
+    }
+
+    const michiPercentage =
+        (
+            payerTotals.Michi /
+            total
+        ) * 100;
+
+    const sabrinaPercentage =
+        (
+            payerTotals.Sabrina /
+            total
+        ) * 100;
+
+    container.innerHTML = `
+        <div class="payer-row">
+            <span
+                class="category-color"
+                style="
+                    background-color:
+                    ${PAYER_COLORS.Michi};
+                "
+            ></span>
+
+            <div>
+                <div class="category-name">
+                    Michi
+                </div>
+
+                <div class="category-value">
+                    ${formatCurrency(
+                        payerTotals.Michi
+                    )}
+                    (${michiPercentage.toFixed(1)} %)
+                </div>
+            </div>
+        </div>
+
+        <div class="payer-row">
+            <span
+                class="category-color"
+                style="
+                    background-color:
+                    ${PAYER_COLORS.Sabrina};
+                "
+            ></span>
+
+            <div>
+                <div class="category-name">
+                    Sabrina
+                </div>
+
+                <div class="category-value">
+                    ${formatCurrency(
+                        payerTotals.Sabrina
+                    )}
+                    (${sabrinaPercentage.toFixed(1)} %)
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderPayerChart(
+    payerTotals
+) {
+    const canvas =
+        document.getElementById(
+            "payerChart"
+        );
+
+    if (payerChart) {
+        payerChart.destroy();
+        payerChart = null;
+    }
+
+    const total =
+        payerTotals.Michi +
+        payerTotals.Sabrina;
+
+    if (total === 0) {
+        canvas.style.display = "none";
+        return;
+    }
+
+    canvas.style.display = "block";
+
+    payerChart =
+        new Chart(canvas, {
+            type: "doughnut",
+
+            data: {
+                labels: [
+                    "Michi",
+                    "Sabrina"
+                ],
+
+                datasets: [{
+                    data: [
+                        payerTotals.Michi,
+                        payerTotals.Sabrina
+                    ],
+
+                    backgroundColor: [
+                        PAYER_COLORS.Michi,
+                        PAYER_COLORS.Sabrina
+                    ],
+
+                    borderColor: "#ffffff",
+                    borderWidth: 2
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "60%",
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label:
+                                function(
+                                    context
+                                ) {
+                                    return (
+                                        context.label +
+                                        ": " +
+                                        formatCurrency(
+                                            context.raw
+                                        )
+                                    );
+                                }
+                        }
+                    }
+                }
+            }
+        });
+}
+
+function buildTopExpenses(expenses) {
+    const container =
+        document.getElementById(
+            "topExpenses"
+        );
+
+    const sortedExpenses =
+        [...expenses]
+            .sort(
+                (a, b) =>
+                    b.analysisAmount -
+                    a.analysisAmount
+            )
+            .slice(0, 5);
+
+    if (sortedExpenses.length === 0) {
+        container.innerHTML = `
+            <p class="empty-message">
+                Keine Ausgaben vorhanden.
+            </p>
+        `;
+
+        return;
+    }
+
+    container.innerHTML =
+        sortedExpenses
+            .map(
+                (expense, index) => {
+                    const description =
+                        expense.description ||
+                        expense.category ||
+                        "Ohne Beschreibung";
+
+                    return `
+                        <div class="top-expense-row">
+                            <div class="top-expense-rank">
+                                ${index + 1}
+                            </div>
+
+                            <div class="top-expense-details">
+                                <div class="category-name">
+                                    ${escapeHtml(
+                                        description
+                                    )}
+                                </div>
+
+                                <div class="category-value">
+                                    ${escapeHtml(
+                                        expense.category ||
+                                        "Sonstiges"
+                                    )}
+                                    ·
+                                    ${formatCurrency(
+                                        expense.analysisAmount
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            )
+            .join("");
+}
+
+function buildTrendAnalysis(
+    expenses,
+    period
+) {
+    const monthlyTotals = {};
+
+    expenses.forEach(expense => {
+        const date = new Date(
+            expense.expense_date +
+            "T00:00:00"
+        );
+
+        const key =
+            date.getFullYear() +
+            "-" +
+            String(
+                date.getMonth() + 1
+            ).padStart(2, "0");
+
+        if (!monthlyTotals[key]) {
+            monthlyTotals[key] = 0;
+        }
+
+        monthlyTotals[key] +=
+            expense.analysisAmount;
+    });
+
+    let entries =
+        Object.entries(monthlyTotals)
+            .sort(
+                (a, b) =>
+                    a[0].localeCompare(
+                        b[0]
+                    )
+            );
+
+    if (period === "month") {
+        entries = entries.slice(-1);
+    }
+
+    renderTrendChart(entries);
+}
+
+function renderTrendChart(entries) {
+    const canvas =
+        document.getElementById(
+            "trendChart"
+        );
+
+    if (trendChart) {
+        trendChart.destroy();
+        trendChart = null;
+    }
+
+    if (entries.length === 0) {
+        canvas.style.display = "none";
+        return;
+    }
+
+    canvas.style.display = "block";
+
+    const labels =
+        entries.map(([key]) => {
+            const [
+                year,
+                month
+            ] = key.split("-");
+
+            const date = new Date(
+                Number(year),
+                Number(month) - 1,
+                1
+            );
+
+            return date.toLocaleDateString(
+                "de-CH",
+                {
+                    month: "short",
+                    year: "numeric"
+                }
+            );
+        });
+
+    const values =
+        entries.map(
+            entry => entry[1]
+        );
+
+    trendChart =
+        new Chart(canvas, {
+            type: "line",
+
+            data: {
+                labels: labels,
+
+                datasets: [{
+                    label: "Ausgaben",
+                    data: values,
+                    borderColor: "#2f7cf6",
+                    backgroundColor:
+                        "rgba(47, 124, 246, 0.15)",
+                    fill: true,
+                    tension: 0.25,
+                    pointRadius: 4,
+                    pointBackgroundColor:
+                        "#2f7cf6"
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                scales: {
+                    y: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            callback:
+                                function(value) {
+                                    return (
+                                        "CHF " +
+                                        value
+                                    );
+                                }
+                        }
+                    }
+                },
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label:
+                                function(
+                                    context
+                                ) {
+                                    return formatCurrency(
+                                        context.raw
+                                    );
+                                }
+                        }
+                    }
+                }
+            }
+        });
+}
+
+function formatCurrency(amount) {
+    return new Intl.NumberFormat(
+        "de-CH",
+        {
+            style: "currency",
+            currency: "CHF"
+        }
+    ).format(
+        Number(amount || 0)
     );
+}
+
+[
+    "analysisPeriod",
+    "analysisPerspective",
+    "analysisExpenseType"
+].forEach(elementId => {
+    document
+        .getElementById(elementId)
+        .addEventListener(
+            "change",
+            loadAnalysis
+        );
+});

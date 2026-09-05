@@ -394,3 +394,103 @@ button[onclick="logoutUser()"]:hover {
     color: #666;
     font-size: 13px;
 }
+
+.analysis-filters {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.analysis-filters label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.analysis-section {
+    padding-top: 18px;
+    margin-top: 18px;
+    border-top: 1px solid #eee;
+}
+
+.analysis-section h3 {
+    margin: 0 0 14px;
+    font-size: 17px;
+}
+
+.analysis-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.category-details,
+.top-expense-details {
+    min-width: 0;
+}
+
+.payer-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-bottom: 12px;
+}
+
+.chart-container-small {
+    width: 190px;
+    height: 190px;
+}
+
+.top-expense-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.top-expense-row:last-child {
+    border-bottom: none;
+}
+
+.top-expense-rank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    min-width: 27px;
+    border-radius: 50%;
+    color: white;
+    background: #2f7cf6;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.trend-chart-container {
+    position: relative;
+    width: 100%;
+    height: 260px;
+}
+
+#trendChart,
+#payerChart {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+@media (max-width: 768px) {
+    .analysis-filters,
+    .analysis-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .trend-chart-container {
+        height: 220px;
+    }
+}
