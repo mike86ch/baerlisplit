@@ -800,9 +800,6 @@ async function loadActivities() {
             )
             .limit(20);
 
-console.log("ACTIVITIES", data);
-
-
     if (error) {
 
         console.error(error);
