@@ -269,19 +269,6 @@ const expenseData = {
     owner_user_id: currentUserId
 };
 
-console.log("currentUserId:", currentUserId);
-
-console.log("expenseData:", expenseData);
-
-const { data: userData } =
-    await supabaseClient.auth.getUser();
-
-console.log(
-    "auth.uid:",
-    userData?.user?.id
-);
-
-
     if (!expenseDate) {
 
         alert(
@@ -330,13 +317,7 @@ console.log(
 
 
 if (result.error) {
-
-    console.log(result.error);
-
-    alert(
-        JSON.stringify(result.error)
-    );
-
+    alert(result.error.message);
     return;
 }
 
