@@ -329,14 +329,16 @@ console.log(
     }
 
 
-    if (result.error) {
+if (result.error) {
 
-        alert(
-            result.error.message
-        );
+    console.log(result.error);
 
-        return;
-    }
+    alert(
+        JSON.stringify(result.error)
+    );
+
+    return;
+}
 
 
     resetForm();
