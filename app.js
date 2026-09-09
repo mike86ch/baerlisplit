@@ -269,6 +269,18 @@ const expenseData = {
     owner_user_id: currentUserId
 };
 
+console.log("currentUserId:", currentUserId);
+
+console.log("expenseData:", expenseData);
+
+const { data: userData } =
+    await supabaseClient.auth.getUser();
+
+console.log(
+    "auth.uid:",
+    userData?.user?.id
+);
+
 
     if (!expenseDate) {
 
