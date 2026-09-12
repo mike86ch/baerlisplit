@@ -98,7 +98,7 @@ style-src 'self' 'unsafe-inline';
                     <button
                         type="button"
                         class="logout-button"
-                        onclick="logoutUser()">
+                        id="logoutButton">
 
                         Abmelden
 
@@ -211,7 +211,7 @@ style-src 'self' 'unsafe-inline';
     <button
         type="button"
         class="secondary-button"
-        onclick="toggleExpenses()"
+        id="toggleExpensesButton"
     >
         ▼ Mehr anzeigen
     </button>
@@ -354,17 +354,6 @@ style-src 'self' 'unsafe-inline';
     </div>
 
     <script src="app.js"></script>
-
-    <script>
-
-        if ("serviceWorker" in navigator) {
-
-            navigator.serviceWorker
-                .register("sw.js");
-
-        }
-
-    </script>
 
 </body>
 

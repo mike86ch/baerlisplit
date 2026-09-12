@@ -1701,3 +1701,15 @@ document
         "change",
         loadAnalysis
     );
+
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js")
+        .then(() => console.log("Service Worker registriert"))
+        .catch(err => console.error("SW Fehler:", err));
+}
+
+document.getElementById("logoutButton")
+    ?.addEventListener("click", logoutUser);
+
+document.getElementById("toggleExpensesButton")
+    ?.addEventListener("click", toggleExpenses);
