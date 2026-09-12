@@ -582,27 +582,21 @@ function renderExpensesTable(expenses) {
                     )}
                 </td>
 
-                <td class="action-buttons">
-                    <button
-                        type="button"
-                        class="edit-button"
-                        onclick="editExpense(${expense.id})"
-                        title="Buchung bearbeiten"
-                        aria-label="Buchung bearbeiten"
-                    >
-                        ✎
-                    </button>
+<td class="action-buttons">
+    <button
+        type="button"
+        class="edit-button"
+        data-id="${expense.id}">
+        ✎
+    </button>
 
-                    <button
-                        type="button"
-                        class="delete-button"
-                        onclick="deleteExpense(${expense.id})"
-                        title="Buchung löschen"
-                        aria-label="Buchung löschen"
-                    >
-                        ×
-                    </button>
-                </td>
+    <button
+        type="button"
+        class="delete-button"
+        data-id="${expense.id}">
+        ×
+    </button>
+</td>
             </tr>
         `;
     });
@@ -611,19 +605,22 @@ function renderExpensesTable(expenses) {
         expandContainer.style.display =
             "block";
 
-        expandContainer.innerHTML = `
-            <button
-                type="button"
-                class="secondary-button"
-                onclick="toggleExpenses()"
-            >
-                ${
-                    expandedExpenses
-                        ? "▲ Weniger anzeigen"
-                        : `▼ Mehr anzeigen (${expenses.length - expenseLimit})`
-                }
-            </button>
-        `;
+expandContainer.innerHTML = `
+    <button
+        type="button"
+        class="secondary-button"
+        id="toggleExpensesButton">
+        ${
+            expandedExpenses
+                ? "▲ Weniger anzeigen"
+                : `▼ Mehr anzeigen (${expenses.length - expenseLimit})`
+        }
+    </button>
+`;
+
+document
+    .getElementById("toggleExpensesButton")
+    ?.addEventListener("click", toggleExpenses);
     } else {
         expandContainer.style.display =
             "none";
@@ -924,29 +921,27 @@ CHF ${amount}
             .join("");
 
 
-    if (
-    activities.length > 3
-) {
+if (activities.length > 3) {
 
-        feed.innerHTML += `
-            <div class="activity-expand">
+    feed.innerHTML += `
+        <div class="activity-expand">
+            <button
+                type="button"
+                class="secondary-button"
+                id="toggleActivitiesButton">
+                ${
+                    expandedActivities
+                        ? "▲ Weniger anzeigen"
+                        : "▼ Mehr anzeigen"
+                }
+            </button>
+        </div>
+    `;
 
-                <button
-                    type="button"
-                    class="secondary-button"
-                    onclick="toggleActivities()">
-
-                    ${
-                        expandedActivities
-                            ? "▲ Weniger anzeigen"
-                            : "▼ Mehr anzeigen"
-                    }
-
-                </button>
-
-            </div>
-        `;
-    }
+    document
+        .getElementById("toggleActivitiesButton")
+        ?.addEventListener("click", toggleActivities);
+}
 }
 
 function getActionLabel(actionType) {
@@ -1711,5 +1706,20 @@ if ("serviceWorker" in navigator) {
 document.getElementById("logoutButton")
     ?.addEventListener("click", logoutUser);
 
-document.getElementById("toggleExpensesButton")
-    ?.addEventListener("click", toggleExpenses);
+    document.addEventListener("click", (event) => {
+
+    const editButton = event.target.closest(".edit-button");
+
+    if (editButton) {
+        editExpense(editButton.dataset.id);
+        return;
+    }
+
+    const deleteButton = event.target.closest(".delete-button");
+
+    if (deleteButton) {
+        deleteExpense(deleteButton.dataset.id);
+        return;
+    }
+
+});
