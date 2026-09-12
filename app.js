@@ -16,7 +16,6 @@ const USER_MAPPINGS = {
     "sabrina_graf@bluewin.ch": "Sabrina"
 };
 
-
 let editingExpenseId = null;
 let expensesCache = [];
 let currentUserId = null;
@@ -25,6 +24,7 @@ let activityLimit = 3;
 let expandedActivities = false;
 let expenseLimit = 5;
 let expandedExpenses = false;
+let activitiesCache = [];
 
 const loginContainer =
     document.getElementById("loginContainer");
@@ -793,7 +793,7 @@ async function loadActivities() {
                     ascending: false
                 }
             )
-            .limit(20);
+            .limit(100);
 
     if (error) {
 
@@ -808,10 +808,11 @@ async function loadActivities() {
         return;
     }
 
+activitiesCache = data || [];
 
-    renderActivityFeed(
-        data || []
-    );
+renderActivityFeed(
+    activitiesCache
+);
 }
 
 
@@ -1049,16 +1050,15 @@ supabaseClient.auth.onAuthStateChange(
 );
 
 function toggleActivities() {
-
     expandedActivities =
         !expandedActivities;
 
-    loadActivities();
+    renderActivityFeed(
+        activitiesCache
+    );
 }
 
 let categoryChart = null;
-let payerChart = null;
-let trendChart = null;
 
 const CATEGORY_COLORS = {
     "Lebensmittel & Haushalt": "#55a868",
@@ -1597,87 +1597,6 @@ function renderPayerSummary(
     `;
 }
 
-function renderPayerChart(
-    payerTotals
-) {
-    const canvas =
-        document.getElementById(
-            "payerChart"
-        );
-
-    if (payerChart) {
-        payerChart.destroy();
-        payerChart = null;
-    }
-
-    const total =
-        payerTotals.Michi +
-        payerTotals.Sabrina;
-
-    if (total === 0) {
-        canvas.style.display = "none";
-        return;
-    }
-
-    canvas.style.display = "block";
-
-    payerChart =
-        new Chart(canvas, {
-            type: "doughnut",
-
-            data: {
-                labels: [
-                    "Michi",
-                    "Sabrina"
-                ],
-
-                datasets: [{
-                    data: [
-                        payerTotals.Michi,
-                        payerTotals.Sabrina
-                    ],
-
-                    backgroundColor: [
-                        PAYER_COLORS.Michi,
-                        PAYER_COLORS.Sabrina
-                    ],
-
-                    borderColor: "#ffffff",
-                    borderWidth: 2
-                }]
-            },
-
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: "60%",
-
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-
-                    tooltip: {
-                        callbacks: {
-                            label:
-                                function(
-                                    context
-                                ) {
-                                    return (
-                                        context.label +
-                                        ": " +
-                                        formatCurrency(
-                                            context.raw
-                                        )
-                                    );
-                                }
-                        }
-                    }
-                }
-            }
-        });
-}
-
 function buildTopExpenses(expenses) {
     const container =
         document.getElementById(
@@ -1741,157 +1660,6 @@ function buildTopExpenses(expenses) {
                 }
             )
             .join("");
-}
-
-function buildTrendAnalysis(
-    expenses,
-    period
-) {
-    const monthlyTotals = {};
-
-    expenses.forEach(expense => {
-        const date = new Date(
-            expense.expense_date +
-            "T00:00:00"
-        );
-
-        const key =
-            date.getFullYear() +
-            "-" +
-            String(
-                date.getMonth() + 1
-            ).padStart(2, "0");
-
-        if (!monthlyTotals[key]) {
-            monthlyTotals[key] = 0;
-        }
-
-        monthlyTotals[key] +=
-            expense.analysisAmount;
-    });
-
-    let entries =
-        Object.entries(monthlyTotals)
-            .sort(
-                (a, b) =>
-                    a[0].localeCompare(
-                        b[0]
-                    )
-            );
-
-    if (period === "month") {
-        entries = entries.slice(-1);
-    }
-
-    renderTrendChart(entries);
-}
-
-function renderTrendChart(entries) {
-    const canvas =
-        document.getElementById(
-            "trendChart"
-        );
-
-    if (trendChart) {
-        trendChart.destroy();
-        trendChart = null;
-    }
-
-    if (entries.length === 0) {
-        canvas.style.display = "none";
-        return;
-    }
-
-    canvas.style.display = "block";
-
-    const labels =
-        entries.map(([key]) => {
-            const [
-                year,
-                month
-            ] = key.split("-");
-
-            const date = new Date(
-                Number(year),
-                Number(month) - 1,
-                1
-            );
-
-            return date.toLocaleDateString(
-                "de-CH",
-                {
-                    month: "short",
-                    year: "numeric"
-                }
-            );
-        });
-
-    const values =
-        entries.map(
-            entry => entry[1]
-        );
-
-    trendChart =
-        new Chart(canvas, {
-            type: "line",
-
-            data: {
-                labels: labels,
-
-                datasets: [{
-                    label: "Ausgaben",
-                    data: values,
-                    borderColor: "#2f7cf6",
-                    backgroundColor:
-                        "rgba(47, 124, 246, 0.15)",
-                    fill: true,
-                    tension: 0.25,
-                    pointRadius: 4,
-                    pointBackgroundColor:
-                        "#2f7cf6"
-                }]
-            },
-
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-
-                scales: {
-                    y: {
-                        beginAtZero: true,
-
-                        ticks: {
-                            callback:
-                                function(value) {
-                                    return (
-                                        "CHF " +
-                                        value
-                                    );
-                                }
-                        }
-                    }
-                },
-
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-
-                    tooltip: {
-                        callbacks: {
-                            label:
-                                function(
-                                    context
-                                ) {
-                                    return formatCurrency(
-                                        context.raw
-                                    );
-                                }
-                        }
-                    }
-                }
-            }
-        });
 }
 
 function formatCurrency(amount) {

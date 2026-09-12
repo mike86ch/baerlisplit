@@ -199,16 +199,6 @@ td:last-child {
     background: #d68910;
 }
 
-/* Logout-Button */
-
-button[onclick="logoutUser()"] {
-    background: #555;
-}
-
-button[onclick="logoutUser()"]:hover {
-    background: #444;
-}
-
 /* Mobile */
 
 @media (max-width: 768px) {
@@ -292,19 +282,8 @@ button[onclick="logoutUser()"]:hover {
     background: #444;
 }
 
-.activity-line {
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
-    line-height: 1.4;
-}
-
 .activity-line:last-child {
     border-bottom: none;
-}
-
-.activity-meta {
-    color: #666;
-    font-size: 14px;
 }
 
 #activityFeed {
@@ -315,21 +294,12 @@ button[onclick="logoutUser()"]:hover {
 .secondary-button {
     width: auto;
     margin-bottom: 10px;
-}
-
-#activityFeed {
-    max-height: 650px;
-    overflow-y: auto;
+    background: #555;
 }
 
 .activity-expand {
     margin-top: 10px;
     text-align: center;
-}
-
-.secondary-button {
-    width: auto;
-    background: #555;
 }
 
 .secondary-button:hover {
@@ -470,18 +440,6 @@ button[onclick="logoutUser()"]:hover {
     background: #2f7cf6;
     font-size: 13px;
     font-weight: bold;
-}
-
-.trend-chart-container {
-    position: relative;
-    width: 100%;
-    height: 260px;
-}
-
-#trendChart,
-#payerChart {
-    width: 100% !important;
-    height: 100% !important;
 }
 
 @media (max-width: 768px) {
