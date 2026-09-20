@@ -452,11 +452,12 @@ if (error) {
 }
 
 
-    /*
-     * Supabase RLS liefert bereits nur:
-     * - gemeinsame Buchungen
-     * - eigene private Buchungen
-     */
+/*
+ * Supabase RLS liefert:
+ * - gemeinsame Buchungen
+ * - private Buchungen des Benutzers
+ * - private Buchungen, die der Benutzer selbst erfasst hat
+ */
     expensesCache = data || [];
 
 
@@ -1054,6 +1055,8 @@ function toggleActivities() {
 }
 
 let categoryChart = null;
+let currentAnalysisExpenses = [];
+let selectedAnalysisCategory = null;
 
 const CATEGORY_COLORS = {
     "Lebensmittel & Haushalt": "#55a868",
@@ -1239,6 +1242,13 @@ function loadAnalysis() {
             filteredExpenses,
             perspective
         );
+
+    currentAnalysisExpenses =
+    perspectiveExpenses;
+
+selectedAnalysisCategory = null;
+
+hideCategoryDrilldown();
 
     buildCategoryAnalysis(
         perspectiveExpenses
@@ -1457,34 +1467,215 @@ function renderCategoryChart(totals) {
                 }]
             },
 
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
+options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    onHover: function(event, elements) {
+        event.native.target.style.cursor =
+            elements.length > 0
+                ? "pointer"
+                : "default";
+    },
+    onClick: function(event, elements) {
+        if (elements.length === 0) {
+            return;
+        }
 
-                plugins: {
-                    legend: {
-                        display: false
+        const clickedIndex =
+            elements[0].index;
+
+        const category =
+            labels[clickedIndex];
+
+        showCategoryDrilldown(
+            category
+        );
+    },
+    plugins: {
+        legend: {
+            display: false
+        },
+        tooltip: {
+            callbacks: {
+                label:
+                    function(context) {
+                        return (
+                            context.label +
+                            ": " +
+                            formatCurrency(
+                                context.raw
+                            )
+                        );
                     },
-
-                    tooltip: {
-                        callbacks: {
-                            label:
-                                function(
-                                    context
-                                ) {
-                                    return (
-                                        context.label +
-                                        ": " +
-                                        formatCurrency(
-                                            context.raw
-                                        )
-                                    );
-                                }
-                        }
+                afterLabel:
+                    function() {
+                        return "Tippen für Details";
                     }
-                }
             }
+        }
+    }
+}
         });
+}
+
+function showCategoryDrilldown(category) {
+    const container =
+        document.getElementById(
+            "categoryDrilldown"
+        );
+
+    if (!container) {
+        return;
+    }
+
+    selectedAnalysisCategory =
+        category;
+
+    const categoryExpenses =
+        currentAnalysisExpenses
+            .filter(expense =>
+                (
+                    expense.category ||
+                    "Sonstiges"
+                ) === category
+            )
+            .sort((a, b) => {
+                return (
+                    b.expense_date.localeCompare(
+                        a.expense_date
+                    ) ||
+                    Number(b.id) -
+                    Number(a.id)
+                );
+            });
+
+    const categoryTotal =
+        categoryExpenses.reduce(
+            (sum, expense) =>
+                sum +
+                Number(
+                    expense.analysisAmount ||
+                    0
+                ),
+            0
+        );
+
+    let html = `
+        <div class="drilldown-header">
+            <div>
+                <h3>
+                    ${escapeHtml(category)}
+                </h3>
+                <div class="drilldown-total">
+                    ${categoryExpenses.length}
+                    ${
+                        categoryExpenses.length === 1
+                            ? "Buchung"
+                            : "Buchungen"
+                    }
+                    ·
+                    ${formatCurrency(categoryTotal)}
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="drilldown-close"
+                id="closeCategoryDrilldown"
+                aria-label="Detailansicht schliessen"
+            >
+                ×
+            </button>
+        </div>
+
+        <div class="drilldown-list">
+    `;
+
+    categoryExpenses.forEach(
+        expense => {
+            const formattedDate =
+                new Date(
+                    expense.expense_date +
+                    "T00:00:00"
+                ).toLocaleDateString(
+                    "de-CH"
+                );
+
+            const description =
+                expense.description ||
+                "Ohne Beschreibung";
+
+            const beneficiary =
+                expense.beneficiary ===
+                "Beide"
+                    ? "Beide"
+                    : expense.beneficiary;
+
+            html += `
+                <div class="drilldown-row">
+                    <div class="drilldown-main">
+                        <div class="drilldown-description">
+                            ${escapeHtml(description)}
+                        </div>
+
+                        <div class="drilldown-meta">
+                            ${formattedDate}
+                            ·
+                            ${escapeHtml(
+                                expense.payer || ""
+                            )}
+                            →
+                            ${escapeHtml(
+                                beneficiary || ""
+                            )}
+                        </div>
+                    </div>
+
+                    <div class="drilldown-amount">
+                        ${formatCurrency(
+                            expense.analysisAmount
+                        )}
+                    </div>
+                </div>
+            `;
+        }
+    );
+
+    html += `
+        </div>
+    `;
+
+    container.innerHTML = html;
+    container.style.display = "block";
+
+    document
+        .getElementById(
+            "closeCategoryDrilldown"
+        )
+        ?.addEventListener(
+            "click",
+            hideCategoryDrilldown
+        );
+
+    container.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest"
+    });
+}
+
+function hideCategoryDrilldown() {
+    const container =
+        document.getElementById(
+            "categoryDrilldown"
+        );
+
+    if (!container) {
+        return;
+    }
+
+    selectedAnalysisCategory = null;
+    container.style.display = "none";
+    container.innerHTML = "";
 }
 
 function buildPayerAnalysis(expenses) {

@@ -508,3 +508,94 @@ td:last-child {
         margin-top: 8px;
     }
 }
+
+.category-drilldown {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid #ddd;
+}
+
+.drilldown-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.drilldown-header h3 {
+    margin: 0 0 4px;
+    font-size: 18px;
+}
+
+.drilldown-total {
+    color: #666;
+    font-size: 14px;
+}
+
+.drilldown-close {
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    padding: 0;
+    color: white;
+    background: #555;
+    font-size: 24px;
+    line-height: 1;
+}
+
+.drilldown-close:hover {
+    background: #444;
+}
+
+.drilldown-list {
+    display: grid;
+}
+
+.drilldown-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.drilldown-row:last-child {
+    border-bottom: none;
+}
+
+.drilldown-main {
+    min-width: 0;
+}
+
+.drilldown-description {
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+.drilldown-meta {
+    margin-top: 4px;
+    color: #666;
+    font-size: 13px;
+}
+
+.drilldown-amount {
+    flex-shrink: 0;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .drilldown-row {
+        gap: 10px;
+    }
+
+    .drilldown-description {
+        font-size: 16px;
+    }
+
+    .drilldown-amount {
+        font-size: 16px;
+    }
+}
